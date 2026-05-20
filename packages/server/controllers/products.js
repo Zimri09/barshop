@@ -132,27 +132,32 @@ async function deleteProduct(req, res) {
 async function adjustStock(req, res) {
   try {
     const id = req.params.id
-    const { quantity, action_type = 'adjustment', notes } = req.body
+    const { quantity, action_type = 'adjustment' } = req.body
     if (typeof quantity !== 'number') return res.status(400).json({ error: 'quantity must be a number' })
 
     const { data: product, error: getErr } = await supabase.from('products').select('*').eq('id', id).single()
     if (getErr || !product) return res.status(404).json({ error: 'Product not found' })
 
-    const profile = req.user && req.user.profile
+    // Global auth middleware attaches the Supabase user object as req.user
+    // (it doesn't set req.user.profile). Our profiles.id == auth.users.id.
+    const staffId = req.user?.id
+
     const prev = Number(product.stock_quantity || 0)
     const next = Math.max(0, prev + quantity)
 
     const { data, error } = await supabase.from('products').update({ stock_quantity: next }).eq('id', id).select().single()
     if (error) return res.status(400).json({ error: error.message })
 
-    await supabase.from('stock_logs').insert([{
-      product_id: id,
-      staff_id: profile?.id,
-      previous_stock: prev,
-      new_stock: next,
-      action_type,
-      notes: notes || null
-    }]).catch(() => {})
+    // stock_logs schema does NOT include `notes`, so only insert existing columns
+    if (staffId) {
+      await supabase.from('stock_logs').insert([{
+        product_id: id,
+        staff_id: staffId,
+        previous_stock: prev,
+        new_stock: next,
+        action_type,
+      }]).catch(() => {})
+    }
 
     res.json({ data })
   } catch (err) {

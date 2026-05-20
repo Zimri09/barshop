@@ -4,6 +4,15 @@
   -- Enable uuid extension
   create extension if not exists "pgcrypto";
 
+  -- Storage buckets (required for image uploads)
+  -- product images: used by packages/server/controllers/products.js (bucket: "products")
+  -- avatars: used by other parts of the app (bucket: "avatars")
+  insert into storage.buckets (id, name, public)
+  values
+    ('products', 'products', true),
+    ('avatars', 'avatars', true)
+  on conflict (id) do nothing;
+
   -- Profiles linked to auth.users
   create table if not exists profiles (
     id uuid primary key references auth.users(id) on delete cascade,
@@ -105,12 +114,34 @@
   -- PRODUCTS: public browse, restricted modifications
   alter table products enable row level security;
 
-  create policy "public_select" on products for select using (true);
+  do $$
+  begin
+    if not exists (
+      select 1 from pg_policies
+      where schemaname = 'public'
+        and tablename = 'products'
+        and policyname = 'public_select'
+    ) then
+      create policy "public_select" on products for select using (true);
+    end if;
+  end
+  $$;
 
-  create policy "products_staff_admin_select" on products
-    for select using (
-      exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('admin','staff'))
-    );
+  do $$
+  begin
+    if not exists (
+      select 1 from pg_policies
+      where schemaname = 'public'
+        and tablename = 'products'
+        and policyname = 'products_staff_admin_select'
+    ) then
+      create policy "products_staff_admin_select" on products
+        for select using (
+          exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('admin','staff'))
+        );
+    end if;
+  end
+  $$;
   create policy "products_staff_admin_insert" on products
     for insert with check (
       exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('admin','staff'))
