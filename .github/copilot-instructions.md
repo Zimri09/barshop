@@ -1,0 +1,9 @@
+- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+- [x] Clarify Project Requirements (React via Vite + Node.js via Express; JavaScript)
+- [x] Scaffold the Project (npm workspaces + client/server packages)
+- [x] Customize the Project (API health route + Vite proxy + UI check)
+- [x] Install Required Extensions (none)
+- [x] Compile the Project (`npm.cmd install` succeeded)
+- [ ] Create and Run Task (optional)
+- [ ] Launch the Project (run `npm.cmd run dev`)
+- [x] Ensure Documentation is Complete (README.md present)
