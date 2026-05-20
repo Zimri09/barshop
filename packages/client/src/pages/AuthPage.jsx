@@ -5,7 +5,6 @@ import { normalizeLoginIdentifier } from '../utils/authIdentifier'
 
 export default function AuthPage() {
   const navigate = useNavigate()
-  const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -19,36 +18,26 @@ export default function AuthPage() {
     setLoading(true)
 
     try {
-      let result
-      if (isSignUp) {
-        result = await supabase.auth.signUp({
-          email: normalizeLoginIdentifier(email),
-          password,
-        })
-        if (result.error) throw result.error
-        setSuccess('Sign up successful! Check your email to confirm.')
-      } else {
-        result = await supabase.auth.signInWithPassword({
-          email: normalizeLoginIdentifier(email),
-          password,
-        })
-        if (result.error) throw result.error
-        setSuccess('Signed in successfully!')
-        
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', result.data.user.id)
-          .single()
-          .catch(() => ({}))
-          
-        const role = profile?.role || 'customer'
-        let targetPath = '/customer'
-        if (role === 'admin') targetPath = '/admin'
-        else if (role === 'staff') targetPath = '/staff'
-        
-        setTimeout(() => navigate(targetPath), 1000)
-      }
+      const result = await supabase.auth.signInWithPassword({
+        email: normalizeLoginIdentifier(email),
+        password,
+      })
+      if (result.error) throw result.error
+      setSuccess('Signed in successfully!')
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', result.data.user.id)
+        .single()
+        .catch(() => ({}))
+
+      const role = profile?.role || 'customer'
+      let targetPath = '/customer'
+      if (role === 'admin') targetPath = '/admin'
+      else if (role === 'staff') targetPath = '/staff'
+
+      setTimeout(() => navigate(targetPath), 1000)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -62,9 +51,7 @@ export default function AuthPage() {
         {/* Card */}
         <div className="bg-slate-800 rounded-lg border border-slate-700 p-8">
           <h1 className="text-3xl font-bold text-blue-400 mb-2">BarStock</h1>
-          <h2 className="text-xl font-semibold text-white mb-6">
-            {isSignUp ? 'Create Account' : 'Sign In'}
-          </h2>
+          <h2 className="text-xl font-semibold text-white mb-6">Sign In</h2>
 
           {error && (
             <div className="mb-4 p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm">
@@ -112,24 +99,14 @@ export default function AuthPage() {
               disabled={loading}
               className="w-full py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-medium rounded transition"
             >
-              {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
+              {loading ? 'Loading...' : 'Sign In'}
             </button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-slate-700">
             <p className="text-gray-400 text-sm text-center">
-              {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+              Accounts are created by an admin.
             </p>
-            <button
-              onClick={() => {
-                setIsSignUp(!isSignUp)
-                setError(null)
-                setSuccess(null)
-              }}
-              className="w-full mt-2 py-2 text-blue-400 hover:text-blue-300 font-medium"
-            >
-              {isSignUp ? 'Sign In' : 'Create Account'}
-            </button>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 text-center">

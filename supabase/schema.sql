@@ -161,11 +161,12 @@
     using (exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('admin','staff')));
 
   create policy "orders_insert_customer_or_staff" on orders for insert
-    using (
+    with check (
       exists (select 1 from profiles p where p.id = auth.uid())
-    ) with check (
+      and (
       -- allow customers to create their own orders or staff/admin
       auth.uid() = customer_id or exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('admin','staff'))
+      )
     );
 
   create policy "orders_staff_admin_update" on orders

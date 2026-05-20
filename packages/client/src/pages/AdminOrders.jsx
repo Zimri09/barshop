@@ -124,6 +124,11 @@ export default function AdminOrders() {
                     <span className="text-slate-400 text-xs">{new Date(order.created_at).toLocaleString()}</span>
                   </div>
 
+                  <div className="text-right text-xs text-slate-400">
+                    <div className="font-medium text-white">{order.guest_name || 'Guest checkout'}</div>
+                    <div>{order.guest_phone || 'No phone number'}</div>
+                  </div>
+
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-bold text-white">₱{Number(order.total_amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                     <select

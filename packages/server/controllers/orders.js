@@ -26,9 +26,15 @@ async function createOrder(req, res) {
     const orderType = payload.order_type || 'preorder'
     const isWalkIn = orderType === 'walk-in'
     const isStaff = !!profile && (profile.role === 'staff' || profile.role === 'admin')
+    const guestName = String(payload.guest_name || profile?.full_name || '').trim()
+    const guestPhone = String(payload.guest_phone || profile?.phone || '').trim()
 
     if (isWalkIn && !isStaff) {
       return res.status(403).json({ error: 'Only staff can create walk-in sales' })
+    }
+
+    if (!isWalkIn && (!guestName || !guestPhone)) {
+      return res.status(400).json({ error: 'Name and mobile number are required' })
     }
 
     // Insert order
@@ -41,8 +47,8 @@ async function createOrder(req, res) {
       payment_method: payload.payment_method || 'cash',
     }
 
-    if (payload.guest_name) orderPayload.guest_name = String(payload.guest_name).trim()
-    if (payload.guest_phone) orderPayload.guest_phone = String(payload.guest_phone).trim()
+    if (guestName) orderPayload.guest_name = guestName
+    if (guestPhone) orderPayload.guest_phone = guestPhone
 
     const { data: orderData, error: orderError } = await supabase.from('orders').insert([orderPayload]).select().single()
     if (orderError) {

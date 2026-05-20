@@ -3,31 +3,38 @@ import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../services/supabaseClient'
 import CustomerNavbar from '../components/CustomerNavbar'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Trash2, ShoppingBag, Clock, ArrowRight } from 'lucide-react'
 import { getProductFallbackImage } from '../utils/productCategories'
 
 export default function CartPage() {
   const { items, updateQty, clearCart } = useCart()
-  const { user } = useAuth()
-  const navigate = useNavigate()
+  const { user, profile } = useAuth()
   const [loading, setLoading] = useState(false)
 
   const [pickupTime, setPickupTime] = useState('')
   const [orderId, setOrderId] = useState('')
   const [contactName, setContactName] = useState('')
   const [contactPhone, setContactPhone] = useState('')
-  const [contactSaving, setContactSaving] = useState(false)
-  const [contactSaved, setContactSaved] = useState(false)
   const [contactError, setContactError] = useState('')
 
   const subtotal = items.reduce((s, it) => s + Number(it.price) * it.quantity, 0)
   const total = subtotal
 
+  useEffect(() => {
+    if (!profile) return
+    setContactName((current) => current || profile.full_name || '')
+    setContactPhone((current) => current || profile.phone || '')
+  }, [profile])
+
   async function handleCheckout(e) {
     e.preventDefault()
     if (items.length === 0) return alert('Your cart is empty.')
     if (!pickupTime) return alert('Please select a pickup time.')
+    if (!contactName.trim() || !contactPhone.trim()) {
+      setContactError('Please enter your name and mobile number.')
+      return
+    }
 
     setLoading(true)
     try {
@@ -36,7 +43,9 @@ export default function CartPage() {
 
       const orderPayload = {
         items,
-        order_type: 'preorder'
+        order_type: 'preorder',
+        guest_name: contactName.trim(),
+        guest_phone: contactPhone.trim(),
       }
 
       const headers = {
@@ -56,48 +65,12 @@ export default function CartPage() {
       if (!newOrderId) throw new Error('Order created but missing order id.')
 
       setOrderId(newOrderId)
-      setContactName('')
-      setContactPhone('')
-      setContactSaved(false)
       setContactError('')
       clearCart()
     } catch (err) {
       alert(err.message)
     } finally {
       setLoading(false)
-    }
-  }
-
-  async function handleContactSubmit(e) {
-    e.preventDefault()
-    if (!orderId) return
-    if (!contactName.trim() || !contactPhone.trim()) {
-      setContactError('Please enter your name and mobile number.')
-      return
-    }
-
-    setContactSaving(true)
-    setContactError('')
-    try {
-      const { data: { session } = {} } = await supabase.auth.getSession()
-      const token = session?.access_token
-      const headers = { 'Content-Type': 'application/json' }
-      if (token) headers.Authorization = `Bearer ${token}`
-
-      const res = await fetch(`/api/orders/${orderId}/contact`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({ guest_name: contactName.trim(), guest_phone: contactPhone.trim() })
-      })
-
-      const json = await res.json()
-      if (!res.ok) throw new Error(json?.error || 'Could not save contact info.')
-      setContactSaved(true)
-      if (user) navigate('/customer/orders')
-    } catch (err) {
-      setContactError(err.message)
-    } finally {
-      setContactSaving(false)
     }
   }
 
@@ -119,50 +92,18 @@ export default function CartPage() {
         {orderId ? (
           <div className="bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-2xl p-6 shadow-xl">
             <h2 className="text-xl font-bold text-white">Pre-order placed</h2>
-            <p className="text-slate-400 text-sm mt-2">Please add your name and mobile number so staff can confirm your order.</p>
             <p className="text-slate-500 text-xs mt-2 font-mono">Order ID: {orderId.slice(0, 8).toUpperCase()}</p>
 
-            {contactSaved ? (
-              <div className="mt-4 rounded-lg border border-emerald-700/40 bg-emerald-900/20 p-3 text-sm text-emerald-200">
-                Contact details saved. You can close this page or keep shopping.
+            <div className="mt-4 grid gap-2 text-sm text-slate-300 max-w-md">
+              <div className="rounded-lg border border-slate-800 bg-slate-950/70 px-4 py-3">
+                <div className="text-xs uppercase tracking-wider text-slate-500">Contact Name</div>
+                <div className="mt-1 font-semibold text-white">{contactName}</div>
               </div>
-            ) : (
-              <form onSubmit={handleContactSubmit} className="mt-6 space-y-4 max-w-md">
-                <div>
-                  <label className="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    value={contactName}
-                    onChange={(e) => setContactName(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">Mobile Number</label>
-                  <input
-                    type="tel"
-                    value={contactPhone}
-                    onChange={(e) => setContactPhone(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm"
-                    placeholder="Enter your mobile number"
-                  />
-                </div>
-
-                {contactError && (
-                  <p className="text-rose-300 text-sm">{contactError}</p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={contactSaving}
-                  className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-850 disabled:text-slate-500 transition-all"
-                >
-                  {contactSaving ? 'Saving...' : 'Save Contact Info'}
-                </button>
-              </form>
-            )}
+              <div className="rounded-lg border border-slate-800 bg-slate-950/70 px-4 py-3">
+                <div className="text-xs uppercase tracking-wider text-slate-500">Mobile Number</div>
+                <div className="mt-1 font-semibold text-white">{contactPhone}</div>
+              </div>
+            </div>
 
             <Link to="/customer/browse" className="inline-block mt-4 text-sm text-emerald-400">Continue shopping</Link>
           </div>
@@ -250,6 +191,34 @@ export default function CartPage() {
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 text-xs font-semibold uppercase tracking-wider mb-2">Mobile Number</label>
+                  <input
+                    type="tel"
+                    required
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-sm"
+                    placeholder="Enter your mobile number"
+                  />
+                </div>
+
+                {contactError && (
+                  <p className="text-rose-300 text-sm">{contactError}</p>
+                )}
 
                 {/* Cost Breakdown */}
                 <div className="pt-4 border-t border-slate-800/80 space-y-2 text-sm">

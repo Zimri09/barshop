@@ -58,6 +58,10 @@ export default function StaffDashboard() {
   }, [products, query])
 
   const total = cart.reduce((sum, line) => sum + Number(line.price) * line.quantity, 0)
+  const productCount = products.length
+  const lowStockCount = products.filter((p) => Number(p.stock_quantity) > 0 && Number(p.stock_quantity) <= Number(p.reorder_threshold)).length
+  const outOfStockCount = products.filter((p) => Number(p.stock_quantity) <= 0).length
+  const cartItemCount = cart.reduce((sum, line) => sum + line.quantity, 0)
 
   function addToCart(product) {
     if (Number(product.stock_quantity) <= 0) {
@@ -140,8 +144,8 @@ export default function StaffDashboard() {
       <div className="border-b border-slate-800 bg-slate-900/60 backdrop-blur px-6 py-4 shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-white">Staff POS</h1>
-            <p className="text-slate-400 text-sm">Point of sale — walk-in orders</p>
+            <h1 className="text-xl font-bold text-white">Staff Dashboard</h1>
+            <p className="text-slate-400 text-sm">Inventory overview and walk-in sales in one place</p>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/staff/orders" className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium border border-slate-700 transition-colors">
@@ -150,6 +154,31 @@ export default function StaffDashboard() {
             <Link to="/staff/stock" className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium border border-slate-700 transition-colors">
               <Package2 className="w-4 h-4" /> Stock
             </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl w-full mx-auto px-6 pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+            <p className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Products</p>
+            <p className="mt-2 text-2xl font-extrabold text-white">{productCount}</p>
+            <p className="text-xs text-slate-400 mt-1">Catalog items loaded for selling</p>
+          </div>
+          <div className="rounded-2xl border border-amber-900/40 bg-amber-950/20 p-4">
+            <p className="text-[11px] uppercase tracking-wider text-amber-300 font-semibold">Low Stock</p>
+            <p className="mt-2 text-2xl font-extrabold text-amber-300">{lowStockCount}</p>
+            <p className="text-xs text-slate-400 mt-1">Items reaching reorder threshold</p>
+          </div>
+          <div className="rounded-2xl border border-rose-900/40 bg-rose-950/20 p-4">
+            <p className="text-[11px] uppercase tracking-wider text-rose-300 font-semibold">Out of Stock</p>
+            <p className="mt-2 text-2xl font-extrabold text-rose-300">{outOfStockCount}</p>
+            <p className="text-xs text-slate-400 mt-1">Unavailable products on the floor</p>
+          </div>
+          <div className="rounded-2xl border border-emerald-900/40 bg-emerald-950/20 p-4">
+            <p className="text-[11px] uppercase tracking-wider text-emerald-300 font-semibold">Current Sale</p>
+            <p className="mt-2 text-2xl font-extrabold text-emerald-300">₱{total.toFixed(2)}</p>
+            <p className="text-xs text-slate-400 mt-1">{cartItemCount} item{cartItemCount === 1 ? '' : 's'} in cart</p>
           </div>
         </div>
       </div>
