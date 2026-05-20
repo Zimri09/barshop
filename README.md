@@ -31,6 +31,12 @@ npm.cmd run dev
 - Client: http://localhost:5173
 - API health: http://localhost:3001/api/health
 
+## GitHub Pages
+
+The frontend can be published to GitHub Pages from the `.github/workflows/pages.yml` workflow. It builds the Vite client from `packages/client` and serves it with hash-based routes so refreshes work on Pages.
+
+The Express API is not hosted on GitHub Pages, so it still needs a separate backend host.
+
 ## Run individually
 
 ```powershell

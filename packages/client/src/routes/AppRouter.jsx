@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import AdminDashboard from '../pages/AdminDashboard'
 import AdminOrders from '../pages/AdminOrders'
 import AdminUsers from '../pages/AdminUsers'
@@ -23,7 +23,7 @@ import ProtectedRoute from '../components/ProtectedRoute'
 
 export default function AppRouter() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AuthProvider>
         <CartProvider>
           <Routes>
@@ -59,6 +59,6 @@ export default function AppRouter() {
           </Routes>
         </CartProvider>
       </AuthProvider>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
