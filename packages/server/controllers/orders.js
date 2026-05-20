@@ -166,4 +166,39 @@ async function updateOrderContact(req, res) {
   }
 }
 
-module.exports = { createOrder, listOrders, getOrder, updateOrderStatus, updateOrderContact }
+async function trackOrder(req, res) {
+  try {
+    // To keep the client route unchanged, we interpret :id as the customer's mobile number
+    // (stored in orders.guest_phone).
+    const { id } = req.params
+
+    const phone = String(id || '').trim()
+    if (!phone) return res.status(400).json({ error: 'Mobile number is required' })
+
+    // Find the most recent matching order for this mobile number
+    const { data: orders, error: orderError } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('guest_phone', phone)
+      .order('created_at', { ascending: false })
+      .limit(1)
+
+    if (orderError) return res.status(500).json({ error: orderError.message })
+    const order = orders?.[0]
+    if (!order) return res.status(404).json({ error: 'Order not found' })
+
+    const { data: items, error: itemsError } = await supabase
+      .from('order_items')
+      .select('*')
+      .eq('order_id', order.id)
+
+    if (itemsError) return res.status(500).json({ error: itemsError.message })
+
+    res.json({ order, items })
+  } catch (err) {
+    console.error('trackOrder', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+}
+
+module.exports = { createOrder, listOrders, getOrder, trackOrder, updateOrderStatus, updateOrderContact }
