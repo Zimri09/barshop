@@ -1,5 +1,5 @@
 import React from 'react'
-import { Github, Linkedin, Mail, MapPin, Phone } from 'lucide-react'
+import { Github, Linkedin, Mail, MapPin, Phone, X } from 'lucide-react'
 
 const contacts = [
   { icon: Mail, label: 'Email', value: 'zimri.logronio@demo.dev', href: 'mailto:zimri.logronio@demo.dev' },
@@ -9,14 +9,26 @@ const contacts = [
   { icon: MapPin, label: 'Location', value: 'Philippines', href: null },
 ]
 
-export default function AboutMeCard({ className = '' }) {
+export default function AboutMeCard({ className = '', onClose }) {
   return (
     <aside
-      className={`rounded-2xl border border-white/10 bg-slate-900/70 backdrop-blur-md shadow-xl ${className}`}
+      className={`rounded-2xl border border-white/10 bg-slate-900/90 backdrop-blur-md shadow-xl ${className}`}
       aria-label="About the developer"
     >
       <div className="p-5">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400/90 mb-3">About me</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400/90">About me</p>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-700/80 transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
 
         <div className="flex items-center gap-4">
           <img

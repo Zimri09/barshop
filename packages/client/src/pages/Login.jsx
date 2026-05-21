@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../context/AuthContext'
 import { normalizeLoginIdentifier } from '../utils/authIdentifier'
-import AboutMeCard from '../components/AboutMeCard'
+import AboutMeToggle from '../components/AboutMeToggle'
 
 export default function Login() {
   const [searchParams] = useSearchParams()
@@ -42,7 +42,9 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex bg-slate-950 text-slate-100 relative">
+      <AboutMeToggle />
+
       {/* Left panel — brand / atmosphere */}
       <div
         className="hidden lg:flex flex-col justify-between w-1/2 relative overflow-hidden p-12"
@@ -65,11 +67,8 @@ export default function Login() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/40" />
 
-        {/* About me — upper left on desktop */}
-        <AboutMeCard className="relative z-10 max-w-sm" />
-
         {/* Logo */}
-        <div className="relative z-10 mt-8">
+        <div className="relative z-10">
           <span className="text-3xl font-extrabold bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent tracking-tight">
             BarStock
           </span>
@@ -101,13 +100,7 @@ export default function Login() {
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex flex-col p-6 lg:p-12 bg-slate-950">
-        {/* About me — upper left on mobile/tablet */}
-        <div className="lg:hidden mb-6 w-full max-w-sm self-start">
-          <AboutMeCard />
-        </div>
-
-        <div className="flex-1 flex items-center justify-center w-full">
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-slate-950">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="lg:hidden mb-8 text-center">
@@ -174,7 +167,6 @@ export default function Login() {
               </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
