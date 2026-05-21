@@ -1,37 +1,46 @@
-const API_URL = import.meta.env.VITE_API_URL
+export const API_URL = import.meta.env.VITE_API_URL
+
+async function request(endpoint, options = {}) {
+  const res = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  })
+
+  if (!res.ok) {
+    throw new Error(`HTTP error! status: ${res.status}`)
+  }
+
+  return res.json()
+}
 
 export const api = {
-  // GET request
-  get: async (endpoint) => {
-    const response = await fetch(`${API_URL}${endpoint}`)
-    return response.json()
+  get: async (endpoint, options = {}) => {
+    return request(endpoint, { ...options, method: 'GET' })
   },
 
-  // POST request
-  post: async (endpoint, body) => {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+  post: async (endpoint, body, options = {}) => {
+    return request(endpoint, {
+      ...options,
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
-    return response.json()
   },
 
-  // PUT request
-  put: async (endpoint, body) => {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+  put: async (endpoint, body, options = {}) => {
+    return request(endpoint, {
+      ...options,
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
-    return response.json()
   },
 
-  // DELETE request
-  delete: async (endpoint) => {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+  delete: async (endpoint, options = {}) => {
+    return request(endpoint, {
+      ...options,
       method: 'DELETE',
     })
-    return response.json()
   },
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import CustomerNavbar from '../components/CustomerNavbar'
 import { User, Phone, Mail, Save, Award, Gift, ArrowRight, ShieldCheck, Lock, Eye, EyeOff } from 'lucide-react'
 
@@ -30,7 +31,7 @@ export default function Profile() {
         const { data: { session } = {} } = await supabase.auth.getSession()
         if (!session) return
         const token = session.access_token
-        const res = await fetch('/api/loyalty', {
+        const res = await fetch(`${API_URL}/api/loyalty`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         const json = await res.json().catch(() => ({}))

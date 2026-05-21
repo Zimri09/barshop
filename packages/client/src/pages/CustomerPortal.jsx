@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import CustomerNavbar from '../components/CustomerNavbar'
 import { Link } from 'react-router-dom'
 import { Compass, ShoppingBag, History, ArrowRight, Award, Package, ChevronRight } from 'lucide-react'
@@ -25,8 +26,8 @@ export default function CustomerPortal() {
         if (!session) return
         const token = session.access_token
         const [loyRes, ordRes] = await Promise.all([
-          fetch('/api/loyalty', { headers: { Authorization: `Bearer ${token}` } }),
-          fetch('/api/orders?perPage=3', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_URL}/api/loyalty`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${API_URL}/api/orders?perPage=3`, { headers: { Authorization: `Bearer ${token}` } }),
         ])
         const loyJson = await loyRes.json().catch(() => ({}))
         const ordJson = await ordRes.json().catch(() => ({}))

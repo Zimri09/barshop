@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import DashboardHeader from '../components/DashboardHeader'
 import { RefreshCw, Plus, Minus } from 'lucide-react'
 
@@ -19,7 +20,7 @@ export default function StaffStock() {
   async function loadProducts() {
     setLoading(true)
     try {
-      const res = await fetch('/api/products?perPage=200')
+      const res = await fetch(`${API_URL}/api/products?perPage=200`)
       const json = await res.json()
       setProducts(json.data || [])
     } catch (err) {
@@ -38,7 +39,7 @@ export default function StaffStock() {
     setSaving(productId)
     try {
       const token = await getToken()
-      const res = await fetch(`/api/products/${productId}/stock`, {
+      const res = await fetch(`${API_URL}/api/products/${productId}/stock`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ quantity: delta, action_type: 'adjustment' }),

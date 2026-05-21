@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import DashboardHeader from '../components/DashboardHeader'
 import { RefreshCw, ChevronDown, ChevronUp } from 'lucide-react'
 
@@ -31,7 +32,7 @@ export default function AdminOrders() {
     setLoading(true)
     try {
       const token = await getToken()
-      const res = await fetch('/api/orders', { headers: { Authorization: `Bearer ${token}` } })
+      const res = await fetch(`${API_URL}/api/orders`, { headers: { Authorization: `Bearer ${token}` } })
       const json = await res.json()
       setOrders(json.data || [])
     } catch (err) {
@@ -48,7 +49,7 @@ export default function AdminOrders() {
     setExpandedId(orderId)
     try {
       const token = await getToken()
-      const res = await fetch(`/api/orders/${orderId}`, { headers: { Authorization: `Bearer ${token}` } })
+      const res = await fetch(`${API_URL}/api/orders/${orderId}`, { headers: { Authorization: `Bearer ${token}` } })
       const json = await res.json()
       setExpandedOrder(json)
     } catch (err) { console.error(err) }
@@ -58,7 +59,7 @@ export default function AdminOrders() {
     setUpdatingId(orderId)
     try {
       const token = await getToken()
-      const res = await fetch(`/api/orders/${orderId}/status`, {
+      const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status }),

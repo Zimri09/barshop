@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Plus, Minus, Trash2, CreditCard, ShoppingCart, ClipboardList, Package2 } from 'lucide-react'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import { getProductFallbackImage } from '../utils/productCategories'
 
 const POS_CART_KEY = 'barstock_pos_cart'
@@ -31,7 +32,7 @@ export default function StaffDashboard() {
     async function load() {
       setLoading(true)
       try {
-        const res = await fetch('/api/products?perPage=200')
+        const res = await fetch(`${API_URL}/api/products?perPage=200`)
         const json = await res.json()
         if (!cancelled) setProducts(json.data || [])
       } catch (err) {
@@ -111,7 +112,7 @@ export default function StaffDashboard() {
     try {
       const { data: { session } = {} } = await supabase.auth.getSession()
       const token = session?.access_token
-      const res = await fetch('/api/orders', {
+      const res = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +129,7 @@ export default function StaffDashboard() {
       setCart([])
       localStorage.removeItem(POS_CART_KEY)
       alert(`Sale completed. Total: ₱${total.toFixed(2)}`)
-      const prodRes = await fetch('/api/products?perPage=200')
+      const prodRes = await fetch(`${API_URL}/api/products?perPage=200`)
       const prodJson = await prodRes.json()
       setProducts(prodJson.data || [])
     } catch (err) {

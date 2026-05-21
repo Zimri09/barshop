@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { toast } from '../services/toast.jsx'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 
 export function isLowStock(product) {
   const stock = Number(product?.stock_quantity ?? 0)
@@ -14,7 +15,7 @@ export function useLowStockAlerts(enabled = true) {
 
   const refresh = useCallback(async () => {
     try {
-      const res = await fetch('/api/products?perPage=500')
+      const res = await fetch(`${API_URL}/api/products?perPage=500`)
       const json = await res.json()
       setLowStock((json.data || []).filter(isLowStock))
     } catch (err) {
