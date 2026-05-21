@@ -24,26 +24,42 @@ export default function ProductPage() {
   const { id } = useParams()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const { addToCart } = useCart()
+  const { isFav, toggle: toggleFav } = useFavorite(id)
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       setLoading(true)
+      setError(null)
+      setProduct(null)
       try {
         const res = await fetch(`${API_URL}/api/products/${id}`)
-        const json = await res.json()
+        const json = await res.json().catch(() => ({}))
         if (cancelled) return
-        setProduct(json.data)
-
+        if (!res.ok) {
+          setError(json?.error || 'Product not found')
+          setProduct(null)
+          return
+        }
+        setProduct(json.data || null)
       } catch (err) {
-        console.error(err)
+        if (!cancelled) {
+          console.error(err)
+          setError('Failed to load product')
+          setProduct(null)
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
-    load()
+    if (id) load()
+    else {
+      setLoading(false)
+      setError('Invalid product')
+    }
     return () => { cancelled = true }
   }, [id])
 
@@ -62,7 +78,7 @@ export default function ProductPage() {
         <CustomerNavbar />
         <div className="max-w-4xl mx-auto px-4 mt-12 text-center">
           <h2 className="text-2xl font-bold text-white">Product Not Found</h2>
-          <p className="text-slate-400 mt-2">The requested vintage might have been archived or is sold out.</p>
+          <p className="text-slate-400 mt-2">{error || 'The requested vintage might have been archived or is sold out.'}</p>
           <Link to="/customer/browse" className="inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-950/20">
             <ArrowLeft className="w-4 h-4" />
             <span>Return to Vault</span>
@@ -73,7 +89,6 @@ export default function ProductPage() {
   }
 
   const isOutOfStock = product.stock_quantity <= 0
-  const { isFav, toggle: toggleFav } = useFavorite(product.id)
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-16">
