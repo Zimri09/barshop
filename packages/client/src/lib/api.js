@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.VITE_API_URL
+export const API_URL = import.meta.env.VITE_API_URL || 'https://barshop-20m4.onrender.com'
 
 async function request(endpoint, options = {}) {
   const res = await fetch(`${API_URL}${endpoint}`, {

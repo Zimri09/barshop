@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || ''
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://barshop-20m4.onrender.com'
 
 const originalFetch = globalThis.fetch.bind(globalThis)
 
