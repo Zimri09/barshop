@@ -29,6 +29,7 @@ export default function StaffOrders() {
   const [expandedOrder, setExpandedOrder] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
   const [filterStatus, setFilterStatus] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   async function getToken() {
     const { data: { session } = {} } = await supabase.auth.getSession()
@@ -102,7 +103,17 @@ export default function StaffOrders() {
     }
   }
 
-  const filtered = filterStatus ? orders.filter((o) => o.status === filterStatus) : orders
+  const filtered = orders.filter((o) => {
+    if (filterStatus && o.status !== filterStatus) return false
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      const matchId = o.id.toLowerCase().includes(q)
+      const matchName = (o.guest_name || '').toLowerCase().includes(q)
+      const matchPhone = (o.guest_phone || '').toLowerCase().includes(q)
+      if (!matchId && !matchName && !matchPhone) return false
+    }
+    return true
+  })
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100">
@@ -114,8 +125,16 @@ export default function StaffOrders() {
           </button>
         </DashboardHeader>
 
-        {/* Status filter pills */}
-        <div className="flex gap-2 mb-6 flex-wrap">
+        {/* Search and Filter */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by Order ID, Name, or Phone..."
+            className="flex-1 max-w-md px-4 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500"
+          />
+          <div className="flex gap-2 flex-wrap">
           {['', ...STATUS_OPTIONS].map((s) => (
             <button
               key={s || 'all'}
@@ -129,6 +148,7 @@ export default function StaffOrders() {
               {s || 'All'}
             </button>
           ))}
+          </div>
         </div>
 
         {loading ? (
