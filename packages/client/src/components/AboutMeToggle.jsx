@@ -25,7 +25,7 @@ export default function AboutMeToggle({ className = '' }) {
   }, [open])
 
   return (
-    <div ref={panelRef} className={`fixed top-4 left-4 z-50 ${className}`}>
+    <div ref={panelRef} className={`fixed bottom-4 right-4 z-[100] ${className}`}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -41,7 +41,7 @@ export default function AboutMeToggle({ className = '' }) {
       </button>
 
       {open && (
-        <div className="absolute top-14 left-0 w-[min(100vw-2rem,320px)] opacity-100 translate-y-0 transition-all duration-200">
+        <div className="absolute bottom-14 right-0 w-[min(100vw-2rem,320px)] opacity-100 transition-all duration-200">
           <AboutMeCard onClose={() => setOpen(false)} />
         </div>
       )}

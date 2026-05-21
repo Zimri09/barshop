@@ -3,8 +3,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../context/AuthContext'
 import { normalizeLoginIdentifier } from '../utils/authIdentifier'
-import AboutMeToggle from '../components/AboutMeToggle'
-
 export default function Login() {
   const [searchParams] = useSearchParams()
   const nextPath = searchParams.get('next') || ''
@@ -42,9 +40,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-950 text-slate-100 relative">
-      <AboutMeToggle />
-
+    <div className="min-h-screen flex bg-slate-950 text-slate-100">
       {/* Left panel — brand / atmosphere */}
       <div
         className="hidden lg:flex flex-col justify-between w-1/2 relative overflow-hidden p-12"
