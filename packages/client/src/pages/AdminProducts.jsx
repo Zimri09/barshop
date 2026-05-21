@@ -35,8 +35,17 @@ export default function AdminProducts() {
         </main>
 
         {showForm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded shadow-lg w-full max-w-2xl">
+          <div
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowForm(false)}
+            role="presentation"
+          >
+            <div
+              className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-2xl shadow-2xl w-full max-w-lg ring-1 ring-white/10"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+            >
               <ProductForm
                 initial={editing}
                 onClose={() => setShowForm(false)}
