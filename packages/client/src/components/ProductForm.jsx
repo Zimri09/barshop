@@ -7,15 +7,15 @@ import { API_URL } from '../lib/api'
 
 const schema = z.object({
   name: z.string().min(1),
-  brand: z.string().optional(),
-  description: z.string().optional(),
+  brand: z.string().nullish(),
+  description: z.string().nullish(),
   price: z.coerce.number().nonnegative(),
   stock_quantity: z.coerce.number().int().nonnegative(),
-  reorder_threshold: z.coerce.number().int().nonnegative().optional(),
-  sku: z.string().optional(),
-  category_id: z.string().optional(),
-  supplier_id: z.string().optional(),
-  image_url: z.string().optional(),
+  reorder_threshold: z.coerce.number().int().nonnegative().nullish(),
+  sku: z.string().nullish(),
+  category_id: z.string().nullish(),
+  supplier_id: z.string().nullish(),
+  image_url: z.string().nullish(),
 })
 
 export default function ProductForm({ initial = null, onClose, onSaved }) {
