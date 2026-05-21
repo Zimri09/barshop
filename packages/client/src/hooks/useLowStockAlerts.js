@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { toast } from 'react-toastify'
+import { toast } from '../services/toast.jsx'
 import { supabase } from '../services/supabaseClient'
 
 export function isLowStock(product) {
