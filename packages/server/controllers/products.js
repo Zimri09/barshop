@@ -150,13 +150,14 @@ async function adjustStock(req, res) {
 
     // stock_logs schema does NOT include `notes`, so only insert existing columns
     if (staffId) {
-      await supabase.from('stock_logs').insert([{
+      const { error: logErr } = await supabase.from('stock_logs').insert([{
         product_id: id,
         staff_id: staffId,
         previous_stock: prev,
         new_stock: next,
         action_type,
-      }]).catch(() => {})
+      }])
+      if (logErr) console.error('Failed to create stock log:', logErr)
     }
 
     res.json({ data })
