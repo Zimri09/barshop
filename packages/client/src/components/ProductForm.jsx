@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 
 const schema = z.object({
   name: z.string().min(1),
@@ -26,7 +27,7 @@ export default function ProductForm({ initial = null, onClose, onSaved }) {
   const [categories, setCategories] = useState([])
 
   useEffect(() => {
-    fetch('/api/categories')
+    fetch(`${API_URL}/api/categories`)
       .then((r) => r.json())
       .then((json) => setCategories(json.data || []))
       .catch(() => setCategories([]))
@@ -41,7 +42,7 @@ export default function ProductForm({ initial = null, onClose, onSaved }) {
   async function onSubmit(data) {
     try {
       const method = initial ? 'PUT' : 'POST'
-      const url = initial ? `/api/products/${initial.id}` : '/api/products'
+      const url = initial ? `${API_URL}/api/products/${initial.id}` : `${API_URL}/api/products`
       const { data: { session } = {} } = await supabase.auth.getSession()
       const token = session?.access_token
       const res = await fetch(url, {
@@ -68,7 +69,7 @@ export default function ProductForm({ initial = null, onClose, onSaved }) {
       fd.append('image', file)
       const { data: { session } = {} } = await supabase.auth.getSession()
       const token = session?.access_token
-      const res = await fetch('/api/products/upload', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: fd })
+      const res = await fetch(`${API_URL}/api/products/upload`, { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: fd })
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error || 'Upload failed')
       setValue('image_url', json.url)

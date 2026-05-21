@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import DashboardHeader from '../components/DashboardHeader'
 import { RefreshCw, Shield } from 'lucide-react'
 
@@ -27,7 +28,7 @@ export default function AdminUsers() {
     setLoading(true)
     try {
       const token = await getToken()
-      const res = await fetch('/api/users', { headers: { Authorization: `Bearer ${token}` } })
+      const res = await fetch(`${API_URL}/api/users`, { headers: { Authorization: `Bearer ${token}` } })
       const json = await res.json()
       setUsers(json.data || [])
     } catch (err) {
@@ -43,7 +44,7 @@ export default function AdminUsers() {
     setUpdatingId(userId)
     try {
       const token = await getToken()
-      const res = await fetch(`/api/users/${userId}/role`, {
+      const res = await fetch(`${API_URL}/api/users/${userId}/role`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ role }),

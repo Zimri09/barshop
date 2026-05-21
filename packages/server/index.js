@@ -9,18 +9,31 @@ const usersRoutes = require('./routes/users')
 const { authMiddleware } = require('./middleware/authMiddleware')
 
 const PORT = Number(process.env.PORT) || 3001
+const CORS_ORIGINS = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean)
 
 const app = express()
 
 app.use(express.json())
 
-if (process.env.NODE_ENV !== 'production') {
-  app.use(
-    cors({
-      origin: true,
-    }),
-  )
-}
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) {
+        return callback(null, true)
+      }
+
+      if (CORS_ORIGINS.length === 0 || CORS_ORIGINS.includes(origin)) {
+        return callback(null, true)
+      }
+
+      return callback(new Error('Not allowed by CORS'))
+    },
+    credentials: true,
+  }),
+)
 
 // Apply auth middleware globally (optional, can be per-route too)
 app.use(authMiddleware)
@@ -48,4 +61,9 @@ app.use('/api/users', usersRoutes)
 
 app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT}`)
+  if (CORS_ORIGINS.length > 0) {
+    console.log(`CORS origins: ${CORS_ORIGINS.join(', ')}`)
+  } else {
+    console.log('CORS origins: allow all (set CORS_ORIGINS to restrict)')
+  }
 })

@@ -11,6 +11,7 @@ Fullstack liquor shop management: Vite + React frontend + Express backend + Supa
 ```
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon-key>
+VITE_API_BASE_URL=https://<your-backend-domain>
 ```
 
 ### `packages/server/.env`
@@ -20,6 +21,7 @@ SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_ANON_KEY=<anon-key>
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 PORT=3001
+CORS_ORIGINS=https://<your-vercel-domain>
 ```
 
 ---
@@ -77,6 +79,10 @@ npm run build
 Serve `packages/client/dist` as static files (e.g. Vercel, Netlify, Nginx).
 
 Deploy `packages/server` as a Node.js server (e.g. Railway, Render, Fly.io).
+
+If the frontend is deployed on Vercel and the backend is deployed elsewhere, set `VITE_API_BASE_URL` in the Vercel project so `/api/*` requests point at the backend instead of the Vercel domain.
+
+If the backend is on a different domain than the frontend, set `CORS_ORIGINS` on the backend deployment to a comma-separated list of allowed frontend origins.
 
 ---
 

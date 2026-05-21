@@ -4,6 +4,7 @@ import CustomerNavbar from '../components/CustomerNavbar'
 import { useCart } from '../context/CartContext'
 import { Search, SlidersHorizontal, ArrowUpDown, RefreshCw } from 'lucide-react'
 import { buildCategoryList, productMatchesCategory } from '../utils/productCategories'
+import { API_URL } from '../lib/api'
 
 export default function CustomerBrowse() {
   const [products, setProducts] = useState([])
@@ -26,7 +27,7 @@ export default function CustomerBrowse() {
 
   async function loadCategories() {
     try {
-      const catRes = await fetch('/api/categories')
+      const catRes = await fetch(`${API_URL}/api/categories`)
       const catJson = await catRes.json()
       setCategories(catJson.data || [])
     } catch (err) {
@@ -40,14 +41,14 @@ export default function CustomerBrowse() {
       const params = new URLSearchParams({ perPage: '200' })
       if (categoryName) params.set('categoryName', categoryName)
 
-      const prodRes = await fetch(`/api/products?${params}`)
+      const prodRes = await fetch(`${API_URL}/api/products?${params}`)
       const prodJson = await prodRes.json()
       let list = prodJson.data || []
 
       // Server filters by category_id; also include keyword matches for uncategorized items
       if (categoryName) {
         const fromServer = list
-        const allRes = await fetch('/api/products?perPage=200')
+        const allRes = await fetch(`${API_URL}/api/products?perPage=200`)
         const allJson = await allRes.json()
         const all = allJson.data || []
         const serverIds = new Set(fromServer.map((p) => p.id))

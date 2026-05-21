@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import { getProductFallbackImage } from '../utils/productCategories'
 
 export default function ProductList({ onEdit }) {
@@ -11,7 +12,7 @@ export default function ProductList({ onEdit }) {
     async function load() {
       setLoading(true)
       try {
-        const res = await fetch('/api/products?perPage=100')
+        const res = await fetch(`${API_URL}/api/products?perPage=100`)
         const json = await res.json()
         if (cancelled) return
         setProducts(json.data || [])
@@ -30,7 +31,7 @@ export default function ProductList({ onEdit }) {
     try {
       const { data: { session } = {} } = await supabase.auth.getSession()
       const token = session?.access_token
-      const res = await fetch(`/api/products/${id}`, {
+      const res = await fetch(`${API_URL}/api/products/${id}`, {
         method: 'DELETE',
         headers: { Authorization: token ? `Bearer ${token}` : undefined },
       })

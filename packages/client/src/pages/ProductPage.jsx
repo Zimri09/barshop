@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext'
 import CustomerNavbar from '../components/CustomerNavbar'
 import { ArrowLeft, ShoppingCart, Percent, ShieldCheck, HelpCircle, Heart } from 'lucide-react'
 import { getProductFallbackImage } from '../utils/productCategories'
+import { API_URL } from '../lib/api'
 
 function useFavorite(id) {
   const key = 'barstock_favorites'
@@ -31,7 +32,7 @@ export default function ProductPage() {
     async function load() {
       setLoading(true)
       try {
-        const res = await fetch(`/api/products/${id}`)
+        const res = await fetch(`${API_URL}/api/products/${id}`)
         const json = await res.json()
         if (cancelled) return
         setProduct(json.data)

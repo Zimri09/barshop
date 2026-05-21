@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import CustomerNavbar from '../components/CustomerNavbar'
 import { Link } from 'react-router-dom'
 import { Trash2, ShoppingBag, Clock, ArrowRight } from 'lucide-react'
@@ -53,7 +54,7 @@ export default function CartPage() {
       }
       if (token) headers.Authorization = `Bearer ${token}`
 
-      const res = await fetch('/api/orders', {
+      const res = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers,
         body: JSON.stringify(orderPayload)

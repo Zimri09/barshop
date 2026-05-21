@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext'
 import CustomerNavbar from '../components/CustomerNavbar'
 import { Heart, ShoppingCart, Trash2, ArrowRight } from 'lucide-react'
 import { getProductFallbackImage } from '../utils/productCategories'
+import { API_URL } from '../lib/api'
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState([])
@@ -29,7 +30,7 @@ export default function Favorites() {
       }
       setLoading(true)
       try {
-        const res = await fetch(`/api/products?perPage=100`)
+        const res = await fetch(`${API_URL}/api/products?perPage=100`)
         const json = await res.json()
         const all = json.data || []
         setProducts(all.filter((p) => favorites.includes(p.id)))

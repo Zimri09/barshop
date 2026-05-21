@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import CustomerNavbar from '../components/CustomerNavbar'
 import { Link, useLocation } from 'react-router-dom'
 import { Clock, CheckCircle2, Eye, EyeOff, LogIn, UserPlus } from 'lucide-react'
@@ -38,7 +39,7 @@ export default function OrdersPage() {
         return
       }
 
-      const res = await fetch('/api/orders', {
+      const res = await fetch(`${API_URL}/api/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const json = await res.json()
@@ -71,7 +72,7 @@ export default function OrdersPage() {
     setTrackedOrder(null)
 
     try {
-      const res = await fetch(`/api/orders/track/${encodeURIComponent(id)}`)
+      const res = await fetch(`${API_URL}/api/orders/track/${encodeURIComponent(id)}`)
       const json = await res.json()
       if (!res.ok) throw new Error(json?.error || 'Could not track order')
 
@@ -96,7 +97,7 @@ export default function OrdersPage() {
     try {
       const { data: { session } = {} } = await supabase.auth.getSession()
       const token = session?.access_token
-      const res = await fetch(`/api/orders/${orderId}`, {
+      const res = await fetch(`${API_URL}/api/orders/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const json = await res.json()

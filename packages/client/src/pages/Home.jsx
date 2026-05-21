@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 
 export default function Home() {
   const [user, setUser] = useState(null)
@@ -23,7 +24,7 @@ export default function Home() {
 
   const testAPI = async () => {
     try {
-      const response = await fetch('/api/health')
+      const response = await fetch(`${API_URL}/api/health`)
       const data = await response.json()
       setApiStatus(data)
     } catch (err) {

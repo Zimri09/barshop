@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../services/supabaseClient'
+import { API_URL } from '../lib/api'
 import { ShoppingBag, Users, Package, TrendingUp, AlertTriangle } from 'lucide-react'
 
 export default function AdminDashboard() {
@@ -15,7 +16,7 @@ export default function AdminDashboard() {
       try {
         const { data: { session } = {} } = await supabase.auth.getSession()
         const token = session?.access_token
-        const res = await fetch('/api/analytics', { headers: { Authorization: `Bearer ${token}` } })
+        const res = await fetch(`${API_URL}/api/analytics`, { headers: { Authorization: `Bearer ${token}` } })
         const json = await res.json()
         if (!cancelled && res.ok) {
           setStats({
