@@ -41,6 +41,10 @@ export default function ProductForm({ initial = null, onClose, onSaved }) {
 
   async function onSubmit(data) {
     try {
+      const payload = { ...data }
+      if (payload.category_id === '') payload.category_id = null
+      if (payload.supplier_id === '') payload.supplier_id = null
+
       const method = initial ? 'PUT' : 'POST'
       const url = initial ? `${API_URL}/api/products/${initial.id}` : `${API_URL}/api/products`
       const { data: { session } = {} } = await supabase.auth.getSession()
@@ -48,7 +52,7 @@ export default function ProductForm({ initial = null, onClose, onSaved }) {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : undefined },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       })
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
